@@ -64,6 +64,18 @@ AM_CONDITIONAL(COND_FLAC, test x$use_flac = xtrue)
 AM_CONDITIONAL(COND_MUSEPACK, test x$use_musepack = xtrue)
 AM_CONDITIONAL(COND_ITUNES, test x$use_itunes = xtrue)
 
+AC_ARG_WITH(dummy, AC_HELP_STRING([--with-dummy], [Use dummy audio]),
+ [ case "$withval" in
+   no)
+   use_dummy=false
+   ;;
+   *)
+   use_dummy=true
+   ;;
+   esac ],
+  [ use_dummy=false ])
+  
+
 AC_ARG_WITH(oss4, AC_HELP_STRING([--with-oss4=includedir], [Use OSS4 with soundcard.h in includedir (default /usr/lib/oss/include/sys)]),
   [ case "$withval" in
     no)
@@ -97,6 +109,7 @@ AC_ARG_WITH(oss4, AC_HELP_STRING([--with-oss4=includedir], [Use OSS4 with soundc
     oss4_includedir=/usr/lib/oss/include/sys
     ;;
     esac ])
+
 
 dnl Checks for libraries.
 gl_LIBUNISTRING
@@ -178,7 +191,7 @@ fi
 
 case "$host" in
   *-*-linux-*)
-    if test x$use_oss4 != xtrue; then
+    if test x$use_oss4 != xtrue && test x$use_dummy != xtrue; then
         use_alsa=true
 	PKG_CHECK_MODULES(ALSA, [ alsa ])
 	AC_DEFINE(LAUDIO_USE_ALSA, 1, [define if local audio output uses ALSA])
@@ -194,7 +207,7 @@ case "$host" in
     ;;
 esac
 
-if test x$use_oss4 = xtrue; then
+if test x$use_oss4 = xtrue && test x$use_dummy != xtrue; then
    OSS4CPPFLAGS="-I$oss4_includedir"
 
    save_CPPFLAGS="$CPPFLAGS"
@@ -205,8 +218,9 @@ if test x$use_oss4 = xtrue; then
    CPPFLAGS="$save_CPPFLAGS"
 fi
 
-AM_CONDITIONAL(COND_ALSA, test x$use_alsa = xtrue)
-AM_CONDITIONAL(COND_OSS4, test x$use_oss4 = xtrue)
+AM_CONDITIONAL(COND_ALSA, test x$use_alsa = xtrue && test x$use_dummy != xtrue)
+AM_CONDITIONAL(COND_OSS4, test x$use_oss4 = xtrue && test x$use_dummy != xtrue)
+AM_CONDITIONAL(COND_DUMMY, test x$use_dummy = xtrue)
 AC_SUBST(OSS4CPPFLAGS)
 
 AC_CHECK_SIZEOF(void *)

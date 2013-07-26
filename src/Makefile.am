@@ -21,6 +21,10 @@ if COND_OSS4
 OSS4SRC=laudio_oss4.c
 endif
 
+if COND_DUMMY
+DUMMYSRC=laudio_dummy.c
+endif
+
 if COND_AVIO
 AVIO_SRC=avio_evbuffer.c avio_evbuffer.h
 else
@@ -90,7 +94,7 @@ forked_daapd_SOURCES = main.c \
 	rsp_query.c rsp_query.h \
 	daap_query.c daap_query.h \
 	player.c player.h \
-	$(ALSASRC) $(OSS4SRC) laudio.h \
+	$(ALSASRC) $(OSS4SRC) $(DUMMYSRC) laudio.h \
 	raop.c raop.h \
 	evrtsp/rtsp.c evrtp/evrtsp.h \
 	evrtsp/rtsp-internal.h evrtsp/log.h \
